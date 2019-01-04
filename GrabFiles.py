@@ -10,11 +10,15 @@ from shutil import copy2
 from TwentyOnePercentRC import Calculate_21_rc
 
 """ input """
-parent_dir = r"C:\SPANfiles\201812" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out
+parent_dir = r"C:\Users\DDD\Downloads\Test\201812" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out
 cutoff_time = "22:30:00"
-temp_dir =  r"C:\SPANfiles\temp"    # where files in execution list is copied into
+date_start = "01/12/2018"
+date_end = "31/12/2018"
+temp_dir =  r"C:\Users\DDD\Downloads\Test\temp"    # where files in execution list is copied into
 """"""""""""
 cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
+date_start = datetime.datetime.strptime(date_start,"%d/%m/%Y")  
+date_end = datetime.datetime.strptime(date_end,"%d/%m/%Y")
 LOG = []    # create an empty list for logging
 LOG.append("start time: " + str(datetime.datetime.now()))   # insert start time to log list
 
@@ -28,9 +32,12 @@ def Get_Timestamp():
         mtime = os.path.getmtime(pa2)   # get modified time of pa2 file
         mtime = datetime.datetime.fromtimestamp(mtime)    # convert modified time from float to yyyy-mm-dd hh:mm:ss.ssss
         
-        sameday_cutoff = mtime.replace(hour=cutoff_time.time().hour, minute=cutoff_time.time().minute, second=cutoff_time.time().minute, microsecond=0)   # from cut off time, find cut off time of the same day of the modified date & time
+        sameday_cutoff = mtime.replace(hour=cutoff_time.time().hour, minute=cutoff_time.time().minute, second=cutoff_time.time().minute, microsecond=0)   
+        # from cut off time, find cut off time of the same day of the modified date & time
+        sameday_cutoff_onehr_later = sameday_cutoff.replace(hour=sameday_cutoff.hour + 1, minute=sameday_cutoff.minute, second=sameday_cutoff.minute, microsecond=0)  
 
-        if mtime > sameday_cutoff:  # check if modified time of pa2 file is after cut off time
+        if sameday_cutoff <= mtime <= sameday_cutoff_onehr_later and date_start <= mtime <= date_end: 
+        # check if modified time of pa2 file is after cut off time
             timestamp = pa2[(len(parent_dir)+1):(len(parent_dir)+16)]     # extract time stamp from file name. From end of parent directory to the next 15 characters
             timestamp_list.append(timestamp)            # append time stamp to timestamp list
 
@@ -100,6 +107,7 @@ execution_list = Get_Files(timestamp_list)
 Copy_2_temp(execution_list)
 
 for eachdate in execution_list:
+    print ("running: " + str(eachdate[0]))
     Calculate_21_rc (temp_dir + "\\" , 
         eachdate[0],    # output timestamp
         eachdate[1],    # pa2 
