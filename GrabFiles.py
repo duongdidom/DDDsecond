@@ -10,11 +10,11 @@ from shutil import copy2
 from TwentyOnePercentRC import Calculate_21_rc
 
 """ input """
-parent_dir = r"D:\span\rc\out" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out
-cutoff_time = "17:00:00"
-date_start = "24/12/2018"
-date_end = "25/12/2018"
-temp_dir =  r"\\tsclient\C\SPANfiles\temp"    # where files in execution list is copied into
+parent_dir = r"C:\SPANfiles\201812" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out or C:\SPANfiles\201812
+cutoff_time = "22:30:00"
+date_start = "01/12/2018"   # beginning of capturing period
+date_end = "31/12/2018"     # one day after end of capturing period
+temp_dir =  r"C:\SPANfiles\temp"    # where files in execution list is copied into. E.g. \\tsclient\C\SPANfiles\temp or C:\SPANfiles\temp
 """"""""""""
 cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
 date_start = datetime.datetime.strptime(date_start,"%d/%m/%Y")  

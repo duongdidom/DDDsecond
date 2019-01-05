@@ -723,7 +723,7 @@ def rc_SPAN_instruction(new_pa2,whatif_xml,sum_position_rc_txt, spn, spanit_txt)
 
 ### 9.3. run SPAN, given instruction text file
 def call_SPAN(spanit_txt):
-    os.chdir (r"C:\span4\bin")  # os.chdir = change current working directory
+    os.chdir (r"C:\Span4\Bin")  # os.chdir = change current working directory
     subprocess.call(["spanitrm.exe",spanit_txt])
 
 ### 9.4. generate SPAN report
@@ -732,8 +732,10 @@ def call_SPAN(spanit_txt):
 # mshta must be given an absolute pathname, not a relative one
 # this process does not work with filenames containing spaces " "
 def call_SPAN_report(spn,pbreq_csv):
-    os.chdir(r"C:\span4\Reports")
-    subprocess.call(["mshta.exe", r"C:\span4\rptmodule\spanReport.hta", spn])
+    
+    print ("\n" + spn + "\n" + pbreq_csv)
+    os.chdir(r"C:\Span4\Reports")
+    subprocess.call(["mshta.exe", r"C:\Span4\RptModule\spanReport.hta", spn])
 
     # Convert spanReport.hta output (Link AP\C:\span4\Reports\PB Req Delim.txt) to (parent directory + \YYYYMMDD-hhmmss_pbreq_identifier.csv)
     pbreq_txt = r"C:\Span4\Reports\PB Req Delim.txt"
