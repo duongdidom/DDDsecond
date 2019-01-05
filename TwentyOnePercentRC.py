@@ -583,10 +583,8 @@ def parse_position(position_list):
     # 7.2.4. remove duplicate in bpins and bpacc lists. To create sum bpins and sum bpacc lists
     # this is preparation step for creating sum accounts
     sum_bpins_list = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in bpins_list)]
-    print (str(len(bpins_list)) + " v.s. " + str(len(sum_bpins_list)))
     
     temp_list = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in bp_acc_list)]  # sum bp account, no currency
-    print (str(len(bpins_list)) + " v.s. " + str(len(temp_list)))
     
     # 7.2.5. for each account in sum account lists, duplicate the account and add currency NZD & USD for each
     for r in temp_list:
@@ -852,6 +850,7 @@ def read_house(house_csv):
 
 #12. read pbreq margin and pbreq rc files. Combine both to pbreq_list
 # pbreq list now will have margin span requiment, lfvsfv at the top. And equivalent amount of data but for rc at the bottom
+# value of 'span' key = spanReq - anov = span requirement - net option value
 def read_pbreqs(pbreq_margin_csv, pbreq_rc_csv):
     # 12.1. open each pbreq csv files store every row in the csv into a dictionary
     # column heading will be key in the dictionary
@@ -971,7 +970,7 @@ def parse_rc(pbreq_list,sum_bpacc_list,house_list,currency_list):
                 acc['acctype'] = 'Client'
 
         ### c. Calculate things and insert into sum bp acc list
-        # delta adjusted net exposure = lfv sfv + delta lov sov,
+        # delta adjusted net exposure = lfv sfv + delta lov sov = (net FUT position * FUT price) + (net OPT position * delta * underlying price)
         # uncovered stress loss = rc = max( (stress loss - margin) , 0),
         acc['deltanetexps'] = acc['lfvsfv'] + acc['deltalovsov']
         acc['rc'] = max(acc['stressl'] - acc['margin'], 0)
