@@ -7,14 +7,15 @@ import os
 import glob
 import datetime
 from shutil import copy2
+import sys
 from TwentyOnePercentRC import Calculate_21_rc
 
 """ input """
-parent_dir = r"D:\span\rc\out" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out
+parent_dir = r"C:\SPANfiles\201812" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out or C:\SPANfiles
 cutoff_time = "22:30:00"
 date_start = "01/12/2018"   # beginning of capturing period
 date_end = "04/12/2018"     # one day after end of capturing period
-output_dir =  r"C:\Users\douglas.cao\Downloads"    # where files in execution list is copied into. 
+output_dir =  r"C:\SPANfiles\go"    # where files in execution list is copied into. 
 #NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C\SPANfiles\ 
 """"""""""""
 cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
@@ -107,7 +108,17 @@ timestamp_list = Get_Timestamp()
 execution_list = Get_Files(timestamp_list)
 Copy_2_temp(execution_list)
 
-if input("Calculate 21% RC ? ").lower() == "yes":    # ask for user input if would like to run 21% RC calculation
+# ask for user input if would like to run 21% RC calculation
+if sys.version.startswith("3") and input("Calculate 21% RC ? ").lower() == "yes":   
+# case python 3, use input()
+    bCalc21percentRC = True
+elif sys.version.startswith("2") and raw_input("Calculate 21% RC ? ").lower() == "yes":
+# case python 3, use raw_input()
+    bCalc21percentRC = True
+else:
+    bCalc21percentRC = False
+
+if bCalc21percentRC == True:
     for eachdate in execution_list:
         print ("running: " + str(eachdate[0]))
         Calculate_21_rc (output_dir + "\\" , 
@@ -118,6 +129,7 @@ if input("Calculate 21% RC ? ").lower() == "yes":    # ask for user input if wou
             eachdate[4],    # rc intermonth
             eachdate[5],    # rc intercomm
             eachdate[6])    # house
+            
 LOG.append("finish time: " + str(datetime.datetime.now()))   # insert finish time to log list
 for log in LOG: print (log)
 
