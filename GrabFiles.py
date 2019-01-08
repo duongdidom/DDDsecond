@@ -15,7 +15,7 @@ parent_dir = r"C:\SPANfiles\201812" # where output of live RiskCapital script is
 cutoff_time = "22:30:00"
 date_start = "01/12/2018"   # beginning of capturing period
 date_end = "04/12/2018"     # one day after end of capturing period
-output_dir =  r"C:\SPANfiles\go"    # where files in execution list is copied into. 
+output_dir =  r"C:\SPANfiles\go"    # where files in execution list is copied into. E.g. C:\Users\douglas.cao\Downloads
 #NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C\SPANfiles\ 
 """"""""""""
 cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
