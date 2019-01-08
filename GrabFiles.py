@@ -98,7 +98,7 @@ def Get_Files(timestamp_list):
     return execution_list
 
 # 3. copying files in execution list to temp folder
-def Copy_2_temp(execution_list):
+def Copy_2_out(execution_list):
     for eachdate in execution_list:
         for eachfile in eachdate[1:]: # skip the 1st item (date)
             copy2(parent_dir + "\\" + eachfile, output_dir)
@@ -106,15 +106,15 @@ def Copy_2_temp(execution_list):
 ### MAIN ###
 timestamp_list = Get_Timestamp()
 execution_list = Get_Files(timestamp_list)
-Copy_2_temp(execution_list)
+Copy_2_out(execution_list)
 
 # ask for user input if would like to run 21% RC calculation
 if sys.version.startswith("3") and input("Calculate 21% RC ? ").lower() == "yes":   
 # case python 3, use input()
     bCalc21percentRC = True
-elif sys.version.startswith("2") and raw_input("Calculate 21% RC ? ").lower() == "yes":
-# case python 3, use raw_input()
-    bCalc21percentRC = True
+# elif sys.version.startswith("2") and raw_input("Calculate 21% RC ? ").lower() == "yes":
+# # case python 3, use raw_input()
+#     bCalc21percentRC = True
 else:
     bCalc21percentRC = False
 
