@@ -13,8 +13,8 @@ from TwentyOnePercentRC import Calculate_21_rc
 parent_dir = r"D:\span\rc\out" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out
 cutoff_time = "22:30:00"
 date_start = "01/12/2018"   # beginning of capturing period
-date_end = "31/12/2018"     # one day after end of capturing period
-output_dir =  r"C:\SPANfiles\temp"    # where files in execution list is copied into. 
+date_end = "04/12/2018"     # one day after end of capturing period
+output_dir =  r"C:\Users\douglas.cao\Downloads"    # where files in execution list is copied into. 
 #NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C\SPANfiles\ 
 """"""""""""
 cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
@@ -107,16 +107,17 @@ timestamp_list = Get_Timestamp()
 execution_list = Get_Files(timestamp_list)
 Copy_2_temp(execution_list)
 
-for eachdate in execution_list:
-    print ("running: " + str(eachdate[0]))
-    Calculate_21_rc (output_dir + "\\" , 
-        eachdate[0],    # output timestamp
-        eachdate[1],    # pa2 
-        eachdate[2],    # position 
-        eachdate[3],    # rc scan
-        eachdate[4],    # rc intermonth
-        eachdate[5],    # rc intercomm
-        eachdate[6])    # house
+if input("Calculate 21% RC ? ").lower() == "yes":    # ask for user input if would like to run 21% RC calculation
+    for eachdate in execution_list:
+        print ("running: " + str(eachdate[0]))
+        Calculate_21_rc (output_dir + "\\" , 
+            eachdate[0],    # output timestamp
+            eachdate[1],    # pa2 
+            eachdate[2],    # position 
+            eachdate[3],    # rc scan
+            eachdate[4],    # rc intermonth
+            eachdate[5],    # rc intercomm
+            eachdate[6])    # house
 LOG.append("finish time: " + str(datetime.datetime.now()))   # insert finish time to log list
 for log in LOG: print (log)
 
