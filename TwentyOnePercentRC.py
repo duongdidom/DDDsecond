@@ -275,7 +275,7 @@ def read_rcparams (rc_scan_csv,rc_intermonth_csv, rc_intercomm_csv):
 # 4. calculate new scan range, new intermonth, new intercomm, based on 3 rc cons files. Then re write intermonth list and intercomm list 
 """
 anything misspecified or missing is ignored, default for scan stretch is 
-0.25, intermonth and intercomm default to what is in original margin pa2
+0.21, intermonth and intercomm default to what is in original margin pa2
 """
 ### 4.1. calcuate new scan range
 # a. append new column to price list
