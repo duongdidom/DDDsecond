@@ -8,14 +8,15 @@ import glob
 import datetime
 from shutil import copy2
 import sys
-from TwentyOnePercentRC import Calculate_21_rc
+sys.path.insert(0, r"C:\Users\DDD\Documents\DuongDiDom1-GitHub\DDDthird")
+import MainRC1
 
 """ input """
-parent_dir = r"C:\SPANfiles\201812" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out or C:\SPANfiles
+parent_dir = r"D:\span\rc\out" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out or C:\SPANfiles or C:\Users\DDD\Downloads\Test\201812
 cutoff_time = "22:30:00"
 date_start = "01/12/2018"   # beginning of capturing period
 date_end = "04/12/2018"     # one day after end of capturing period
-output_dir =  r"C:\SPANfiles\go"    # where files in execution list is copied into. E.g. C:\Users\douglas.cao\Downloads
+output_dir =  r"C:\Users\douglas.cao\Downloads"    # where files in execution list is copied into. E.g. C:\Users\douglas.cao\Downloads
 #NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C\SPANfiles\ 
 """"""""""""
 cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
@@ -103,6 +104,36 @@ def Copy_2_out(execution_list):
         for eachfile in eachdate[1:]: # skip the 1st item (date)
             copy2(parent_dir + "\\" + eachfile, output_dir)
 
+# 4. define output and input file prior to running main RC calculation
+def input_files(output_dir, out_timestamp, pa2_pa2, position_txt, cons_rc_scan_csv, cons_rc_intermonth_csv, cons_rc_intercomm_csv, cons_house_csv):
+    ### skip finding the latest pa2 and position files
+    ### skip copying pa2 and position file to another location
+    pa2_pa2 = output_dir + pa2_pa2
+    position_txt = output_dir + position_txt
+
+    rc_intercomm_csv =  output_dir + cons_rc_intercomm_csv
+    rc_intermonth_csv =  output_dir + cons_rc_intermonth_csv
+    rc_scan_csv =  output_dir + cons_rc_scan_csv
+    house_csv = output_dir + cons_house_csv
+
+    ### 1.1. define a bunch of newly created files
+    # modified files
+    new_pa2 = output_dir + out_timestamp + r"_new.pa2"
+    sum_position_txt = output_dir + out_timestamp + r"_sum.txt"
+    sum_position_rc_txt = output_dir + out_timestamp + r"_sum_rc.txt"
+
+    # newly created files
+    whatif_xml = output_dir + out_timestamp + r"_whatif.xml"
+    spanInstr_margin_txt = output_dir + out_timestamp + r"_spanInstr_margin.txt"  # span instruction for margin
+    spanInstr_rc_txt = output_dir + out_timestamp + r"_spanInstr_rc.txt"  # span instruction for rc
+    span_margin_spn = output_dir + out_timestamp + r"_span_margin.spn"    # spn files
+    span_rc_spn = output_dir + out_timestamp + r"_span_rc.spn"
+    pbreq_margin_csv = output_dir + out_timestamp + r"_pbreq_margin.csv"  # pbreq files
+    pbreq_rc_csv = output_dir + out_timestamp + r"_pbreq_rc.csv"
+    final_csv = output_dir + out_timestamp + r"_final.csv"
+
+    return (pa2_pa2, position_txt, rc_intercomm_csv,rc_intermonth_csv, rc_scan_csv, house_csv, new_pa2, sum_position_txt,sum_position_rc_txt, whatif_xml, spanInstr_margin_txt, spanInstr_rc_txt, span_margin_spn, span_rc_spn, pbreq_margin_csv, pbreq_rc_csv, final_csv)
+
 ### MAIN ###
 timestamp_list = Get_Timestamp()
 execution_list = Get_Files(timestamp_list)
@@ -121,14 +152,73 @@ else:
 if bCalc21percentRC == True:
     for eachdate in execution_list:
         print ("running: " + str(eachdate[0]))
-        Calculate_21_rc (output_dir + "\\" , 
+
+        MainRC1.write_log(output_dir)
+
+        # use function defined above to define input files and output files for mainRC calculation script
+        (pa2_pa2, position_txt, rc_intercomm_csv,rc_intermonth_csv, rc_scan_csv, house_csv, new_pa2, sum_position_txt,sum_position_rc_txt, whatif_xml, spanInstr_margin_txt, spanInstr_rc_txt, span_margin_spn, span_rc_spn, pbreq_margin_csv, pbreq_rc_csv, final_csv) = input_files(
+            output_dir + "\\" , # out put directory
             eachdate[0],    # output timestamp
             eachdate[1],    # pa2 
             eachdate[2],    # position 
             eachdate[3],    # rc scan
             eachdate[4],    # rc intermonth
             eachdate[5],    # rc intercomm
-            eachdate[6])    # house
+            eachdate[6]    # house
+            )
+
+        original_pa2 = MainRC1.read_pa2(pa2_pa2)
+
+        (price_list, intermonth_list, intermonth_param_list, intercomm_list, instrument_list, option_list, deltascale_list, price_param_list, currency_list) = MainRC1.parse_pa2(original_pa2)
+
+        (rc_scan_list, rc_intermonth_list, rc_intercomm_list) = MainRC1.read_rcparams (rc_scan_csv,rc_intermonth_csv, rc_intercomm_csv)
+
+        (price_list, instrument_list) = MainRC1.calc_newscan(price_list, instrument_list, rc_scan_list, 0.21)
+
+        (instrument_list, rc_intermonth_list, intermonth_list) = MainRC1.calc_newintermonth(instrument_list, intermonth_param_list, intermonth_list, rc_intermonth_list)
+
+        intercomm_list = MainRC1.calc_newintercomm (rc_intercomm_list, intercomm_list)
+
+        (new_intermonth_list, new_intercomm_list) = MainRC1.write_newinters(intermonth_list, intercomm_list, original_pa2)
+        
+        MainRC1.write_new_pa2(original_pa2,new_intermonth_list,new_intercomm_list,new_pa2)
+
+        MainRC1.write_whatif(instrument_list, whatif_xml)
+
+        position_list = MainRC1.read_position(position_txt)
+
+        (sum_bpins_list, option_position_list, sum_bpacc_list) = MainRC1.parse_position(position_list)
+
+        MainRC1.write_sum_position_txt(position_list,sum_bpins_list,sum_position_txt)
+
+        MainRC1.write_sum_rc_position_txt(position_list,sum_bpins_list,sum_position_rc_txt)
+
+        # calculate and get report for 
+        ### margin
+        MainRC1.margin_SPAN_instruction(pa2_pa2,sum_position_txt,span_margin_spn,spanInstr_margin_txt)
+
+        MainRC1.call_SPAN(spanInstr_margin_txt)
+
+        MainRC1.call_SPAN_report(span_margin_spn, pbreq_margin_csv)
+    
+        ### risk capital
+        MainRC1.rc_SPAN_instruction(new_pa2,whatif_xml,sum_position_rc_txt,span_rc_spn,spanInstr_rc_txt)    # write txt instruction for SPAN calculation: risk capital
+        MainRC1.call_SPAN(spanInstr_rc_txt)
+
+        MainRC1.call_SPAN_report(span_rc_spn, pbreq_rc_csv)
+
+        (option_position_list, sum_bpacc_list) = MainRC1.delta_adjust(
+        option_list, deltascale_list, price_param_list,instrument_list,     # from pa2 file
+        option_position_list, sum_bpacc_list                                # from position 
+        )
+
+        house_list = MainRC1.read_house(house_csv)
+
+        pbreq_list = MainRC1.read_pbreqs(pbreq_margin_csv, pbreq_rc_csv)
+
+        sum_bpacc_list = MainRC1.parse_rc(pbreq_list,sum_bpacc_list,house_list,currency_list)
+
+        MainRC1.write_rc(sum_bpacc_list,final_csv)
             
 LOG.append("finish time: " + str(datetime.datetime.now()))   # insert finish time to log list
 for log in LOG: print (log)
