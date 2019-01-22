@@ -19,11 +19,6 @@ date_end = "04/12/2018"     # one day after end of capturing period
 output_dir =  r"C:\Users\douglas.cao\Downloads"    # where files in execution list is copied into. E.g. C:\Users\douglas.cao\Downloads
 #NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C\SPANfiles\ 
 """"""""""""
-cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
-date_start = datetime.datetime.strptime(date_start,"%d/%m/%Y")  
-date_end = datetime.datetime.strptime(date_end,"%d/%m/%Y")
-LOG = []    # create an empty list for logging
-LOG.append("start time: " + str(datetime.datetime.now()))   # insert start time to log list
 
 # 1. find a bunch of pa2 files that their modified time is after predefined cut off time
 def Get_Timestamp():
@@ -135,17 +130,24 @@ def input_files(output_dir, out_timestamp, pa2_pa2, position_txt, cons_rc_scan_c
     return (pa2_pa2, position_txt, rc_intercomm_csv,rc_intermonth_csv, rc_scan_csv, house_csv, new_pa2, sum_position_txt,sum_position_rc_txt, whatif_xml, spanInstr_margin_txt, spanInstr_rc_txt, span_margin_spn, span_rc_spn, pbreq_margin_csv, pbreq_rc_csv, final_csv)
 
 ### MAIN ###
-timestamp_list = Get_Timestamp()
-execution_list = Get_Files(timestamp_list)
-Copy_2_out(execution_list)
+cutoff_time = datetime.datetime.strptime(cutoff_time,"%H:%M:%S") # convert cut off time from hh:mm:ss to yyyy-mm-dd hh:mm:ss
+date_start = datetime.datetime.strptime(date_start,"%d/%m/%Y")  
+date_end = datetime.datetime.strptime(date_end,"%d/%m/%Y")
+
+LOG = []    # create an empty list for logging
+LOG.append("start time: " + str(datetime.datetime.now()))   # insert start time to log list
+
+timestamp_list = Get_Timestamp()    # get modified time from pa2 files that meet our predefined conditions
+execution_list = Get_Files(timestamp_list)  # get equivalent lists of position files and 3 rc cons files for such timestamp
+Copy_2_out(execution_list)  # copy those files to a new directory
 
 # ask for user input if would like to run 21% RC calculation
 if sys.version.startswith("3") and input("Calculate 21% RC ? ").lower() == "yes":   
 # case python 3, use input()
     bCalc21percentRC = True
-# elif sys.version.startswith("2") and raw_input("Calculate 21% RC ? ").lower() == "yes":
-# # case python 3, use raw_input()
-#     bCalc21percentRC = True
+elif sys.version.startswith("2") and raw_input("Calculate 21% RC ? ").lower() == "yes":
+# case python 3, use raw_input()
+    bCalc21percentRC = True
 else:
     bCalc21percentRC = False
 
