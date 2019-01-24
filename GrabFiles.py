@@ -1,6 +1,7 @@
 """
 in designated folder, find a bunch of pa2 files that being after 10:30pm.
 find equivalent position file & 3 rc cons files
+script will ask if would like to run 21% rc? 
 run those combination of files for 21% risk capital calculation
 """
 import os
@@ -8,16 +9,16 @@ import glob
 import datetime
 from shutil import copy2
 import sys
-sys.path.insert(0, r"C:\Users\DDD\Documents\DuongDiDom1-GitHub\DDDthird")
+sys.path.insert(0, r"X:\Clearing House\Risk Management\Anaconda\modules\rc")
 import MainRC1
 
 """ input """
-parent_dir = r"D:\span\rc\out" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out or C:\SPANfiles or C:\Users\DDD\Downloads\Test\201812
+parent_dir = r"C:\SPANfiles\201812" # where output of live RiskCapital script is stored. E.g. D:\span\rc\out or C:\SPANfiles or C:\Users\DDD\Downloads\Test\201812
 cutoff_time = "22:30:00"
 date_start = "01/12/2018"   # beginning of capturing period
 date_end = "04/12/2018"     # one day after end of capturing period
-output_dir =  r"C:\Users\douglas.cao\Downloads"    # where files in execution list is copied into. E.g. C:\Users\douglas.cao\Downloads
-#NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C\SPANfiles\ 
+output_dir =  r"C:\SPANfiles\go"    # where files in execution list is copied into. E.g. C:\Users\douglas.cao\Downloads
+#NOTE: output_dir should not be linked between local and remote desktop E.g. \\tsclient\C:\SPANfiles\ 
 """"""""""""
 
 # 1. find a bunch of pa2 files that their modified time is after predefined cut off time
